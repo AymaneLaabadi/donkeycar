@@ -20,11 +20,19 @@ DEFAULTS: dict = {
         "root": "generated_data",          # output dir of donkey_seg_datagen
         "cache_dir": "cache",              # every prepared artefact lives here (safe to delete)
         "val_circuits": ["gen_s388044"],   # held out of train BY CIRCUIT (no near-duplicate leakage)
-        "batch_size": 64,
+        "batch_size": 32,
         "num_workers": 4,
         "pin_memory": True,
         "persistent_workers": True,
-        "seed": 0,
+        "seed": 0,                         # global seed (python, numpy, torch, shuffle order)
+    },
+    "train": {
+        "epochs": 30,
+        "lr": 1e-3,                        # peak LR, reached at the end of warmup
+        "weight_decay": 1e-4,              # AdamW (decoupled)
+        "warmup_epochs": 1,                # linear warmup, then cosine decay to 0
+        "model_base": 16,                  # SmallUNet width
+        "out_dir": "runs",
     },
     "textures": {                          # Step 2: bank of background noise textures
         "count": 128,
@@ -38,7 +46,7 @@ DEFAULTS: dict = {
     "augment": asdict(AugmentConfig()),
 }
 
-_PATH_KEYS = (("data", "root"), ("data", "cache_dir"))
+_PATH_KEYS = (("data", "root"), ("data", "cache_dir"), ("train", "out_dir"))
 
 
 def _merge(base: dict, over: dict, where: str = "") -> dict:

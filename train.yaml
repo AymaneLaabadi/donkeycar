@@ -8,9 +8,17 @@ data:
   root: generated_data
   cache_dir: cache
   val_circuits: [gen_s388044]   # one held-out generated track (2000 frames) -> 8000 train / 2000 val
-  batch_size: 64
+  batch_size: 32
   num_workers: 4                # Windows: keep the training script under `if __name__ == "__main__":`
-  seed: 0
+  seed: 0                       # global seed: python, numpy, torch, shuffle order
+
+train:                          # python -m donkey_seg_train.train [--no-augment] [--resume runs/<run>/last.pt]
+  epochs: 40
+  lr: 1.0e-3                    # AdamW, peak LR after warmup
+  weight_decay: 1.0e-4
+  warmup_epochs: 1              # linear warmup, then cosine decay to 0
+  model_base: 16
+  out_dir: runs
 
 textures:                       # Step 2
   count: 128
@@ -22,7 +30,7 @@ materialize:                    # Step 3: 0 = augment online every epoch (recomm
   seed: 0
 
 augment:
-  enabled: true
+  enabled: True
   # 2. Geometry (mild, image + mask together)
   hflip_p: 0.5
   affine_p: 0.7
