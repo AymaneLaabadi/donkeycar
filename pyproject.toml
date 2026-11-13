@@ -1,0 +1,38 @@
+[project]
+name = "donkey-seg-datagen"
+version = "0.1.0"
+description = "Manual-driving RGB + drivable-road mask collector for the DonkeyCar sim fork with image_seg"
+readme = "README.md"
+authors = [
+    { name = "AymaneLaabadi", email = "aymanelaabadi01@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "pillow",
+    "pyyaml",
+    "gym-donkeycar>=1.3",
+    "pygame-ce",
+]
+
+[project.optional-dependencies]
+torch = ["torch"]  # donkey_seg_datagen.dataset and donkey_seg_train
+
+[project.scripts]
+dsg-collect = "donkey_seg_datagen.collect:main"
+dsg-verify = "donkey_seg_datagen.verify:main"
+dsg-preview = "donkey_seg_datagen.preview:main"
+dsg-prepare = "donkey_seg_train.data.prepare:main"
+dsg-preview-aug = "donkey_seg_train.data.preview:main"
+
+[build-system]
+requires = ["uv_build>=0.8.0,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = ["donkey_seg_datagen", "donkey_seg_train"]
+
+[tool.uv.sources]
+# gym-donkeycar 1.3.x is not on PyPI (PyPI stops at 1.0.13); take it from GitHub,
+# pinned to the same commit as the local ../gym-donkeycar clone (version.txt = 1.3.1).
+gym-donkeycar = { git = "https://github.com/tawnkramer/gym-donkeycar", rev = "a1f4ca6961e17a6929c1f2e883358a1edafb479d" }

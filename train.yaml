@@ -1,0 +1,51 @@
+# donkey_seg_train configuration. Only overrides; defaults live in src/donkey_seg_train/config.py
+# and data/augment.py (AugmentConfig). Unknown keys are an error. Paths are relative to this file.
+#
+#   python -m donkey_seg_train.data.prepare        # Steps 1-3 (cached; reruns are no-ops)
+#   python -m donkey_seg_train.data.preview        # look at the augmentations -> cache/preview_augment.png
+
+data:
+  root: generated_data
+  cache_dir: cache
+  val_circuits: [gen_s388044]   # one held-out generated track (2000 frames) -> 8000 train / 2000 val
+  batch_size: 64
+  num_workers: 4                # Windows: keep the training script under `if __name__ == "__main__":`
+  seed: 0
+
+textures:                       # Step 2
+  count: 128
+  size: [240, 320]
+  seed: 1234
+
+materialize:                    # Step 3: 0 = augment online every epoch (recommended)
+  copies: 0
+  seed: 0
+
+augment:
+  enabled: true
+  # 2. Geometry (mild, image + mask together)
+  hflip_p: 0.5
+  affine_p: 0.7
+  shift: 0.05                   # +-5 %
+  rotate_deg: 5.0               # +-5 deg
+  scale: [0.9, 1.1]
+  # 1. Appearance (strong, image only)
+  color_p: 0.8
+  brightness: 0.25              # +-25 %
+  contrast: 0.25                # +-25 %
+  gamma: [0.7, 1.5]
+  hue_deg: 20.0                 # +-20 deg of 360
+  saturation: 0.3               # +-30 %
+  grayscale_p: 0.05
+  channel_shuffle_p: 0.05
+  shadow_p: 0.3
+  shadow_count: [1, 2]
+  shadow_strength: [0.3, 0.6]
+  background_p: 0.3
+  background_alpha: [0.3, 1.0]
+  background_feather: 5
+  sensor_noise_p: 0.2
+  sensor_noise_std: [0.005, 0.03]
+  cutout_p: 0.5
+  cutout_holes: [1, 4]
+  cutout_size: [0.05, 0.15]

@@ -1,0 +1,21 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Generated datasets / logs
+out/
+out_*/
+generated_data/
+*.log
+.claude/
+
+# Training artefacts (rebuilt by `python -m donkey_seg_train.data.prepare`)
+cache/
+runs/

@@ -1,0 +1,75 @@
+# python -m donkey_seg_datagen.collect --split train --config data_generation_config.yaml
+
+sim:
+  exe_path: "C:/Users/ayman/Projects/DonkeyCar Project/Builds/Segmentation/donkey_sim.exe"
+  launch: auto            # auto: use a sim already listening on host:port, else start exe_path | always | never
+  host: 127.0.0.1
+  port: 9091
+  startup_timeout_s: 90
+  scene_load_timeout_s: 60
+  telemetry_timeout_s: 10
+  discard_s: 1.0          # discard frames for this long after load_scene / gen_track / reset_car
+
+car:
+  body_style: donkey
+  body_rgb: [128, 128, 128]
+  car_name: segdatagen
+  font_size: 30
+
+# Inference camera, sent with cam_config on every circuit. 0 = keep the prefab default.
+# fish_eye_x/y must be 0 (the mask has no fisheye).
+camera:
+  img_w: 160
+  img_h: 120
+  img_d: 3
+  img_enc: PNG
+  fov: 0
+  offset_x: 0
+  offset_y: 0
+  offset_z: 0
+  rot_x: 0
+  rot_y: 0
+  rot_z: 0
+  fish_eye_x: 0
+  fish_eye_y: 0
+
+# Existing scenes with a confirmed road label (SEGMENTATION.md status table).
+# Add warren / mini_monaco / mountain_track here once they pass tools/check_seg.py.
+existing_scenes: [generated_track, mini_monaco, mountain_track]
+generated_scene: generated_road   # gen_track only works in this scene
+
+# A circuit is one track: a gen_track seed or one existing scene.
+# p_generated: probability that a circuit is a generated track (otherwise an unused existing scene).
+# seed_range: [lo, hi) for gen_track seeds; train and test ranges must not overlap.
+splits:
+  train:
+    circuits: 5
+    frames: 2000          # saved frames per circuit
+    frame_step: 2         # save at most every 2nd telemetry frame
+    p_generated: 0.5
+    seed_range: [100000, 500000]
+    plan_seed: 4          # milestone: draws one generated track + generated_track
+  test:
+    circuits: 10
+    frames: 100
+    frame_step: 4
+    p_generated: 0.5
+    seed_range: [900000, 1000000]
+    plan_seed: 2
+
+filters:
+  min_speed: 0.3          # telemetry speed units; slower frames are near-duplicates
+  skip_hit: true          # skip frames with hit != "none"
+
+manual:
+  window_scale: 4
+  steer_rate: 2.5         # keyboard steering slew (full lock per 1/rate s)
+  steer_return: 4.0       # how fast steering re-centres when no key is pressed
+  throttle: 0.5          # keyboard throttle target
+  throttle_rate: 1.5
+  deadzone: 0.08
+  backspace_s: 3.0        # BACKSPACE deletes saved frames from the last N seconds
+  overlay_alpha: 0.4
+
+output:
+  dir: generated_data     # relative to this file
